@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <script src="js/external/jquery-2.1.4.min.js"></script>
+    <script src="js/external/underscore.js"></script>
+    <script src="js/external/backbone.js"></script>
+    <script>
+
+    Book = Backbone.Model.extend({
+        initialize: function(){
+            this.on("change", function(){
+                // this.changed contains changed attributes
+                console.log("Changed attrs: " + JSON.stringify(this.changed));
+            });
+            this.on("change:name", function(){
+                console.log("The name has changed.");
+            });
+
+            if(this.hasChanged('author')){
+                console.log("This book's author has changed.");
+            };
+
+            this.on("invalid", function(model, error){
+                console.log("**Validation Error : " + error + "**");
+            });
+
+        },
+
+        defaults: {
+            name: 'Book title',
+            author: 'No One'
+        },
+
+        validate: function(attrs){
+            if(attrs.year < 2000){
+                return 'Year mustbe after 2000';
+            }
+            if(!attrs.name){
+                return 'A name must be provided';
+            }
+        },
+
+        printDetails: function(){
+            console.log(this.get('name') + 'by ' + this.get('author'));
+        }
+    });
+
+    </script>
+</body>
+</html>
