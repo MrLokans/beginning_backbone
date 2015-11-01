@@ -5,9 +5,22 @@
     <title></title>
 </head>
 <body>
+    <div id="myLibraryViewSection">
+        
+    </div>
     <script src="js/external/jquery-2.1.4.min.js"></script>
     <script src="js/external/underscore.js"></script>
     <script src="js/external/backbone.js"></script>
+    <script type="text/template" id="library-template">
+        <ul<% for (var i=0; i<library.length); i++) { %>
+            <% var book = library[i]; %>
+            <li>
+                <b><%= book.name %></b>by <%= book.author %>
+            </li>
+        <% } %>
+        </ul>
+    </script>
+
     <script>
 
     Book = Backbone.Model.extend({
@@ -99,22 +112,21 @@
     var thirdBook = new Book({name: 'Operational Systems', author: "Andrew Tannenbaum"});
     var fourthBook = new Book({name: 'Answers', author: "Ayne Rand"});
 
-
     var myOnlineLibrary = new Library([firstBook, secondBook]);
     myOnlineLibrary.add([thirdBook, fourthBook]);
     console.log('Lib contains ' + myOnlineLibrary.length + ' books');
     myOnlineLibrary.remove(secondBook);
     myOnlineLibrary.printContents();
 
-    myOnlineLibrary.fetch({
-        success: function(e){
-            console.log('Got data')l
-        },
+    // myOnlineLibrary.fetch({
+    //     success: function(e){
+    //         console.log('Got data');
+    //     },
 
-        error: function(e){
-            console.log('Something went terribly wrong');
-        },
-    })
+    //     error: function(e){
+    //         console.log('Something went terribly wrong');
+    //     },
+    // });
 
     // .reset() - clears the collection
     // .set() - smartly updates the collection
@@ -134,7 +146,52 @@
     // .where({'attr': 'value'}) - returns array of occurances
     // .findWhere({'attr': 'value'}) - returns the first match
     // .groupBy(<attr>) - groups elements by the value of the scpecified attribute
+    // .create(model) - creates model and updates server state
+    // .destroy() 
 
+
+    LibraryView = Backbone.View.extend({
+        initialize: function(){
+            // this.render();
+        },
+        template: _.template($("#library-template").html()),
+
+        events: {
+            'click .book': 'alertBook'
+        },
+
+        render: function(){
+            var self = this; // This is done to maintain a reference to the original this, even when the context changes.
+            // underscore lib is referenced via _ variable
+            var output = self.template({'library': self.collection.toJSON()});
+            self.$el.append(output);
+            return self;
+        },
+
+        alertBook: function(){
+            alert('Book clicked');
+        }
+
+
+    });
+
+    var newBook = new Book({name: 'Beginning Backbone', author: 'James Sugrue'});
+    var myView = new LibraryView({
+        model: newBook,
+        // el: "#myLibraryViewSection",
+        tagName: 'ul',
+        className: 'libraryview',
+        id: 'library',
+        attributes: {'data-date': new Date()}
+    });
+
+    var myLibraryView = new LibraryView({
+        collection: myOnlineLibrary,
+        el: '#myLibraryViewSection',
+
+    });
+
+    console.log(myView.el);
     </script>
 </body>
 </html>
