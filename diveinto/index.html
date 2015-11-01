@@ -11,6 +11,7 @@
     <script>
 
     Book = Backbone.Model.extend({
+        urlRoot: 'http://localhost:8080/books/',
         initialize: function(){
             this.on("change", function(){
                 // this.changed contains changed attributes
@@ -44,10 +45,95 @@
             }
         },
 
+        parse: function(response, xhr){
+            response.bookType = 'ebook';
+            return response;
+        },
+
         printDetails: function(){
             console.log(this.get('name') + 'by ' + this.get('author'));
+        },
+    });
+
+    EBook = Book.extend({
+        printDetails: function(){
+            console.log('Ebook info');
+            Book.prototype.printDetails.call(this);
         }
     });
+
+    var Library = Backbone.Collection.extend({
+        model: Book,
+
+        initialize: function(){
+            console.log('Creating a new library collection');
+            this.on("remove", function(removedModel, models, options){
+                console.log('Element removed at index ' + options.index);
+            });
+        },
+
+        printContents: function(){
+            this.forEach(function(model){
+                console.log(model.get('name'));
+            });
+        },
+
+        comparator: function(a, b){
+            return a.get('name') < b.get('name') ? -1 : 1;
+        },
+    });
+// If you want to reset the state of your model object to the same as it is on the server side, you can invoke the fetch()
+// function. Again, this function accepts an options hash that includes success and error callbacks.
+// thisBook.fetch({
+//      success: function(model, response, options){
+//          console.log('Fetch success');
+//      },
+// 
+//      error: function(model, response, options){
+//          console.log('Fetch error');
+//      }
+// });
+
+    var firstBook = new Book({name: 'Brave New World', author: 'Auldos Haxley'});
+    var secondBook = new Book({name: 'Linux: System Programming', author: "Robert Love"});
+    var thirdBook = new Book({name: 'Operational Systems', author: "Andrew Tannenbaum"});
+    var fourthBook = new Book({name: 'Answers', author: "Ayne Rand"});
+
+
+    var myOnlineLibrary = new Library([firstBook, secondBook]);
+    myOnlineLibrary.add([thirdBook, fourthBook]);
+    console.log('Lib contains ' + myOnlineLibrary.length + ' books');
+    myOnlineLibrary.remove(secondBook);
+    myOnlineLibrary.printContents();
+
+    myOnlineLibrary.fetch({
+        success: function(e){
+            console.log('Got data')l
+        },
+
+        error: function(e){
+            console.log('Something went terribly wrong');
+        },
+    })
+
+    // .reset() - clears the collection
+    // .set() - smartly updates the collection
+    //      If a model doesn’t yet exist in the collection, it will be added. The rule will be ignored if
+    // {add: false} is provided.
+    //      If a model is already in the collection, the attributes will be merged. The rule will be ignored if
+    // {merge: false} is provided.
+    //      If there is a model in the collection that isn’t in the array, it will be removed. The rule will be
+    // ignore if {remove: false} is provided.
+
+    // .at(<index>) returns element on the given position
+    // .get(<cid> or <id>)
+    // .forEach(func(mod))
+    // .sortBy
+    // .shuffle()
+    // .pluck(<attr>) - returns all of occurances of the given attribute in collection
+    // .where({'attr': 'value'}) - returns array of occurances
+    // .findWhere({'attr': 'value'}) - returns the first match
+    // .groupBy(<attr>) - groups elements by the value of the scpecified attribute
 
     </script>
 </body>
