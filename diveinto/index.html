@@ -12,7 +12,7 @@
     <script src="js/external/underscore.js"></script>
     <script src="js/external/backbone.js"></script>
     <script type="text/template" id="library-template">
-        <ul<% for (var i=0; i<library.length); i++) { %>
+        <ul<% for (var i=0; i<library.length; i++) { %>
             <% var book = library[i]; %>
             <li>
                 <b><%= book.name %></b>by <%= book.author %>
@@ -154,7 +154,7 @@
         initialize: function(){
             // this.render();
         },
-        template: _.template($("#library-template").html()),
+        template: _.template( $("#library-template").html() ),
 
         events: {
             'click .book': 'alertBook'
@@ -192,6 +192,33 @@
     });
 
     console.log(myView.el);
+
+    // Routers
+    MyRouter = Backbone.Router.extend({
+        // (:param) means optional param
+        'routes': {'hello/:name/(:skill)': 'sayHello', '': 'start', '*default': 'defaultRoute'},
+        sayHello: function(name, skill){
+            if(skill !== null){
+                console.log('Saying hello to ' + name + ' ' +skill + ' author');
+            } else {
+                console.log('Hello, ' + name);
+            }
+            
+        },
+        start: function(){
+            console.log('Initial route invoked.');
+        },
+
+        // should always be in the end
+        defaultRoute: function(){
+            console.log('No route configured for this.');
+        },
+    });
+    var router = new MyRouter();
+    // We may store our 'history' without using hash fragments with html5
+    // Backbone.history.start({pushState:true});
+    Backbone.history.start();
+
     </script>
 </body>
 </html>
